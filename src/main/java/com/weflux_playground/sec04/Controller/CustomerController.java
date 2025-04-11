@@ -41,36 +41,34 @@ public class CustomerController {
     @GetMapping("{id}")
     public Mono<CustomerDto> getCustomerById(@PathVariable Integer id) {
         return customerService.getCustomerById(id)
-        .switchIfEmpty(ApplicationExceptions.customerNotFoundExceptions(id));
-                
+                .switchIfEmpty(ApplicationExceptions.customerNotFoundExceptions(id));
+
     }
 
     @PostMapping
-    public Mono<CustomerDto> saveCustomer(@RequestBody Mono<CustomerDto> customerDto) {
-     //var validatedmono=  customerDto.transform(RequestValidator.validate());
-       // return customerService.saveCustomer(validatedmono);
-        return customerDto.transform(RequestValidator.validate())
-        .as(this.customerService::saveCustomer);
-
+    public Mono<CustomerDto> saveCustomer(@RequestBody Mono<CustomerDto> mono) {
+        // var validatedmono= mono.transform(RequestValidator.validate());
+        // return customerService.saveCustomer(validatedmono);
+        return mono.transform(RequestValidator.validate())
+                .as(this.customerService::saveCustomer);
 
     }
 
     @PutMapping("{id}")
     public Mono<CustomerDto> updateCustomer(@PathVariable Integer id,
             @RequestBody Mono<CustomerDto> mono) {
-
         return mono.transform(RequestValidator.validate())
-        .as(validreq->this.CustomerService.updateCustomer(id,validreq));
+                .as(validreq -> this.customerService.updateCustomer(id, validreq))
+                .switchIfEmpty(ApplicationExceptions.customerNotFoundExceptions(id));
 
-   
     }
 
     @DeleteMapping("{id}")
-    public Mono<ResponseEntity<Void>> deleteCustomer(@PathVariable Integer id) {
+    public Mono<Void> deleteCustomer(@PathVariable Integer id) {
         return this.customerService.deleteCustomer(id)
                 .filter(b -> b)
-                .map(b -> ResponseEntity.ok().<Void>build())
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+                .switchIfEmpty(ApplicationExceptions.customerNotFoundExceptions(id))
+                .then();
 
     }
 
