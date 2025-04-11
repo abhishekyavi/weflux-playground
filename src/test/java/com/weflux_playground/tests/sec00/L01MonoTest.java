@@ -1,4 +1,4 @@
-package com.weflux_playground;
+package com.weflux_playground.tests.sec00;
 
 import org.junit.jupiter.api.Test;
 

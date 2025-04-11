@@ -1,6 +1,7 @@
 package com.weflux_playground.sec03.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.weflux_playground.sec03.dto.CustomerDto;
@@ -19,6 +20,13 @@ public class CustomerService {
     public Flux<CustomerDto> getAllCustomesr() {
 
         return this.customerRepository.findAll()
+                .map(c -> EntityDtoMapper.toDto(c));
+
+    }
+
+    public Flux<CustomerDto> getAllCustomesr(Integer page, Integer size) {
+
+        return this.customerRepository.findBy(PageRequest.of(page - 1, size))
                 .map(c -> EntityDtoMapper.toDto(c));
 
     }
@@ -48,9 +56,9 @@ public class CustomerService {
                 .map(c -> EntityDtoMapper.toDto(c));
     }
 
-    public Mono<Void> deleteCustomer(Integer id) {
+    public Mono<Boolean> deleteCustomer(Integer id) {
 
-       return  this.customerRepository.deleteById(id);
+        return this.customerRepository.deleteCustomerById(id);
 
     }
 
